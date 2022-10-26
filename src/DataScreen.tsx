@@ -38,15 +38,17 @@ const fieldsToColumns = flatMap((field) => ({
   title: field,
   dataIndex: field,
   key: field,
+  render: (text: any, record: any, index: number) => {
+    console.log({ text, record, index });
+    if (typeof text === 'object') {
+      return <pre>{JSON.stringify(text, null, 2)}</pre>;
+    }
+    return text;
+  },
 }));
 
 const processInitialData = (data: Array<any>) =>
   data.map((dataRow, index) => {
-    Object.keys(dataRow).forEach((key) => {
-      if (typeof dataRow[key] === 'object') {
-        dataRow[key] = JSON.stringify(dataRow[key], null, '\t');
-      }
-    });
     return {
       key: index.toFixed(2),
       ...dataRow,
@@ -108,7 +110,13 @@ const DataScreen = ({ data = [] }: DataScreenProps) => {
             <Input placeholder="Search for all fields" />
           </Form.Item>
         </div>
-        <Table dataSource={filteredData} columns={columns} />
+        <Table
+          bordered
+          sticky
+          tableLayout="fixed"
+          dataSource={filteredData}
+          columns={columns}
+        />
       </Form>
     </div>
   ) : (
