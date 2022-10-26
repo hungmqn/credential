@@ -41,10 +41,17 @@ const fieldsToColumns = flatMap((field) => ({
 }));
 
 const processInitialData = (data: Array<any>) =>
-  data.map((dataRow, index) => ({
-    key: index.toFixed(2),
-    ...dataRow,
-  }));
+  data.map((dataRow, index) => {
+    Object.keys(dataRow).forEach((key) => {
+      if (typeof dataRow[key] === 'object') {
+        dataRow[key] = JSON.stringify(dataRow[key], null, '\t');
+      }
+    });
+    return {
+      key: index.toFixed(2),
+      ...dataRow,
+    };
+  });
 
 const searchData = (search: string) =>
   flow(
