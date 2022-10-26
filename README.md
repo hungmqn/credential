@@ -17,7 +17,7 @@ The web is a simple JSON reader, which:
 
 1. Is for personal use, I do not take any responsibility if you use this page and get your credentials hacked or leaked anywhere else.
 2. Just read what you import on browser, once you open it, you can do everything offline.
-3. The file is not uploaded or sending anywhere else.
+3. The file is not uploaded or send anywhere else.
 
 # Working
 
