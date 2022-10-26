@@ -10,7 +10,10 @@ import {
   Tag,
   Space,
   Empty,
+  Alert,
+  Input,
 } from 'antd';
+import { isEmpty } from 'lodash/fp';
 import { RcFile } from 'antd/lib/upload';
 import { Breakpoint } from 'antd/lib/_util/responsiveObserve';
 
@@ -54,7 +57,6 @@ const Container = ({
 
 const App = () => {
   const [data, setData] = useState<Array<any>>([]);
-  const [selectedFile, setSelectedFile] = useState<undefined | RcFile>();
   const { useBreakpoint } = Grid;
   const screens = useBreakpoint();
   const currentBreakPoint: Breakpoint = useMemo(
@@ -65,16 +67,17 @@ const App = () => {
       ),
     [screens]
   );
+  const isDataValid = useMemo(() => Array.isArray(data), [data]);
 
   const props: UploadProps = {
     accept: '.json',
     beforeUpload: (file: RcFile, _fileList: RcFile[]) => {
       if (file) {
-        setSelectedFile(file);
         const fileReader = new FileReader();
+        message.info(`Processing file: ${file.name}`);
         fileReader.onload = (e) => {
           setData(JSON.parse(e.target?.result as string));
-          message.success(`Processing file: ${file.name}`);
+          message.success(`Processed file: ${file.name}`);
         };
         fileReader.onerror = (e) =>
           message.error(`Fail to read file, details: ${e.target?.result}`);
@@ -88,6 +91,7 @@ const App = () => {
       marginBottom: 24,
     },
   };
+
   return (
     <div>
       <Layout>
@@ -138,12 +142,35 @@ const App = () => {
                 </p>
                 <p className="ant-upload-hint">
                   Requirements: Type: .json | Content: Array of objects. This
-                  will not send file to anywhere. If you refresh, close the tab
-                  or select new file, the data will be reloaded.
+                  will not send file to anywhere. If you refresh the data will
+                  be washed, close the tab or select new file, the data will be
+                  reloaded.
                 </p>
               </Upload.Dragger>
+              <p>
+                Enter data here. (accept JSON string, must be array of objects.)
+              </p>
+              <Input.TextArea
+                allowClear
+                autoSize={{ minRows: 10, maxRows: 10 }}
+                onChange={(event) => {
+                  try {
+                    const result = JSON.parse(event.target.value);
+                    if (result && typeof result === 'object') {
+                      setData(result);
+                    }
+                  } catch (e) {}
+                }}
+              />
               <div>
-                {selectedFile && data ? (
+                {!isDataValid && (
+                  <Alert
+                    message={`Invalid data is imported, please add an array of object. Eg: [{"key": "value"}]`}
+                    type="error"
+                  />
+                )}
+                <p />
+                {isDataValid && !isEmpty(data) ? (
                   <DataScreen data={data} />
                 ) : (
                   <Empty description="No data, please select data file." />

@@ -39,7 +39,6 @@ const fieldsToColumns = flatMap((field) => ({
   dataIndex: field,
   key: field,
   render: (text: any, record: any, index: number) => {
-    console.log({ text, record, index });
     if (typeof text === 'object') {
       return <pre>{JSON.stringify(text, null, 2)}</pre>;
     }
