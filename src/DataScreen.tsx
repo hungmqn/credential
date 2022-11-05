@@ -9,6 +9,7 @@ import {
   map,
   filter,
   debounce,
+  compact,
 } from 'lodash/fp';
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -61,6 +62,14 @@ const searchData = (search: string) =>
     map((record) => JSON.parse(record))
   );
 
+const DEFAULT_COLUMNS = [
+  'service',
+  'username',
+  'email',
+  'password',
+  'phone_number',
+];
+
 const DataScreen = ({ data = [] }: DataScreenProps) => {
   const originData = useMemo(() => processInitialData(data), [data]);
   const [filteredData, setFilteredData] = useState<any>();
@@ -85,7 +94,11 @@ const DataScreen = ({ data = [] }: DataScreenProps) => {
         name="advanced_search"
         className="ant-advanced-search-form"
         initialValues={{
-          selectedFields: fields,
+          selectedFields: compact(
+            fields.map((field) =>
+              DEFAULT_COLUMNS.indexOf(field) >= 0 ? field : false
+            )
+          ),
         }}
         onValuesChange={debounce(500, handleApplyFilter)}
       >
